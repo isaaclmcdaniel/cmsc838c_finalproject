@@ -5,8 +5,10 @@ using UnityEngine;
 public class ControllerManager : MonoBehaviour
 {
     public GameObject levelObject;
+    public float moveControlSpeed = 1;
 
     private bool moveControlActive;
+    private Vector3 moveControlLastPos;
     bool GetTrigger()
     {
         //
@@ -30,17 +32,24 @@ public class ControllerManager : MonoBehaviour
 
     void MoveControl()
     {
+        if (moveControlActive)
+        {
+            // Update levelObject's position, but not rotation, according to left controller's movement
+            levelObject.transform.Translate(transform.position - moveControlLastPos, Space.World);
+        }
         
         if (GetTrigger() && !moveControlActive)
         {
-            StartLevelMovement();
+            //StartLevelMovement();
             moveControlActive = true;
         }
         else if (!GetTrigger() && moveControlActive)
         {
-            StopLevelMovement();
+            //StopLevelMovement();
             moveControlActive = false;
         }
+
+        moveControlLastPos = transform.position;
     }
     
     // Start is called before the first frame update
