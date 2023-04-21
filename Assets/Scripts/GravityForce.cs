@@ -27,7 +27,7 @@ public class GravityForce : MonoBehaviour
         
         obj = transform.parent.gameObject;
         massParent = obj.transform.Find("MassiveBodies");
-        foreach (Transform child in massParent)
+        foreach (Transform child in massiveBodies.transform)
         {
             // check if child has mass (by checking if it has the mass component)
             if(child.gameObject.GetComponent<GravityProperties>() != null)
