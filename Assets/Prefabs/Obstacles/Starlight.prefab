@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5066173910326001007}
   - component: {fileID: 9188017029919035281}
   m_Layer: 0
-  m_Name: Starlight_white
+  m_Name: Starlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
