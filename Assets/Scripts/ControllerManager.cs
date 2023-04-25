@@ -62,5 +62,9 @@ public class ControllerManager : MonoBehaviour
     void Update()
     {
         MoveControl();
+        if (OVRInput.GetUp(OVRInput.Button.One))
+        {
+            levelObject.GetComponent<MainScript>().LaunchUIButtonRelease();
+        }        
     }
 }
