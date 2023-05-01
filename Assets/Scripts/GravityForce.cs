@@ -46,26 +46,29 @@ public class GravityForce : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        // float playermass = GetComponent<GravityProperties>().mass;
-        total_force = new Vector3(0, 0, 0);
-        /*
-         *  for massiveobject in massiveObjects
-         *      calculate direction vector and normalize it
-         *      calculate force magnitude
-         *      multiply them together and add it to total_force
-         *  apply total force
-         */
-        foreach (GameObject massiveObject in massiveObjects)
-        {
-            Vector3 temp = massiveObject.transform.position - transform.position;
-            float dist = temp.magnitude;
-            total_force +=
-                (gravitationalConstant * mass * massiveObject.GetComponent<GravityProperties>().mass / (dist * dist)) *
-                temp.normalized;
-
-        }
-        Debug.Log("Total force: " + total_force);
-
-        m_Rigidbody.AddForce(total_force, ForceMode.Force);
+        if(gameObject.activeSelf)
+		{
+			// float playermass = GetComponent<GravityProperties>().mass;
+	        total_force = new Vector3(0, 0, 0);
+	
+	        /*
+	         *  for massiveobject in massiveObjects
+	         *      calculate direction vector and normalize it
+	         *      calculate force magnitude
+	         *      multiply them together and add it to total_force
+	         *  apply total force
+	         */
+	        foreach (GameObject massiveObject in massiveObjects)
+	        {
+	            Vector3 temp = massiveObject.transform.localPosition - transform.localPosition;
+	            float dist = temp.magnitude;
+	            total_force +=
+	                (gravitationalConstant * mass * massiveObject.GetComponent<GravityProperties>().mass / (dist * dist)) *
+	                temp.normalized;
+	        }
+	        Debug.Log("Total force: " + total_force);
+	
+	        m_Rigidbody.AddForce(total_force * transform.parent.localScale.x, ForceMode.Force);
+    	} 
     }
 }
