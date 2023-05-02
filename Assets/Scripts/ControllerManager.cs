@@ -76,13 +76,17 @@ public class ControllerManager : MonoBehaviour
         {
             // Update levelObject's position, but not rotation, according to left controller's movement
             //levelObject.transform.Translate(transform.position - moveControlLastPos, Space.World);
-            float distance = Vector3.Distance(transform.position, zoomAnchor.transform.position);
+            float anchorOffset = Vector3.Distance(transform.position, zoomAnchor.transform.position);
+            
+            Vector3 levelOffset = transform.position - levelObject.transform.position;
+            float levelOffsetNorm = levelOffset.magnitude;
             
             // Scale levelObject according to change in distance between controllers
-            levelObject.transform.localScale = zoomObject.transform.localScale * distance / zoomControlLastDist;
+            levelObject.transform.localScale = zoomObject.transform.localScale * anchorOffset / zoomControlLastDist;
+            levelObject.transform.position = transform.position - levelOffset * anchorOffset / zoomControlLastDist;
             
             // Scale velocty of gravity-driven object according to change in distance between controllers
-            gravityDrivenObject.GetComponent<Rigidbody>().velocity = gravityDrivenObject.GetComponent<Rigidbody>().velocity * distance / zoomControlLastDist;
+            gravityDrivenObject.GetComponent<Rigidbody>().velocity = gravityDrivenObject.GetComponent<Rigidbody>().velocity * anchorOffset / zoomControlLastDist;
         }
         
         if (GetZoomTrigger() && !zoomControlActive)
