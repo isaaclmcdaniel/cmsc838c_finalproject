@@ -9,11 +9,13 @@ public class MainScript : MonoBehaviour
 	public Material startObjectUIMaterial;
 	public Material destObjectUIMaterial;
 
+    public GameObject spacePuck;
+
 	private int gameState;
 	private Material startObjectOrigMaterial;
 	private Material destObjectOrigMaterial;
 
-	void PaintLaunchUITextures()
+	void PaintLaunchUIPlanetTextures()
 	{
 		startObjectOrigMaterial = startObject.GetComponent<MeshRenderer> ().material;
 		destObjectOrigMaterial = destObject.GetComponent<MeshRenderer> ().material;
@@ -22,20 +24,20 @@ public class MainScript : MonoBehaviour
 		destObject.GetComponent<MeshRenderer> ().material = destObjectUIMaterial;
 	}
 
-	void RemoveLaunchUITextures()
+	void RemoveLaunchUIPlanetTextures()
 	{
 		startObject.GetComponent<MeshRenderer> ().material = startObjectOrigMaterial;
 		destObject.GetComponent<MeshRenderer> ().material = destObjectOrigMaterial;
 	}
 
-	public void LaunchUIButtonRelease()
-	{
-		if(gameState == 1)
-		{
-			RemoveLaunchUITextures();
-			gameState = 2;
-		}
-	}
+    private void LaunchUIButtonRelease()
+    {
+        if(gameState == 1)
+        {
+            RemoveLaunchUIPlanetTextures();
+            gameState = 2;
+        }
+    }
 
 	bool PackageLaunched()
 	{
@@ -47,14 +49,14 @@ public class MainScript : MonoBehaviour
 		switch(gameState)
 		{	
 		case 0:
-			PaintLaunchUITextures();
+			PaintLaunchUIPlanetTextures();
 			gameState = 1;
 			break;
 		case 1:
 			// if launched, remove launch UI textures
 			if(PackageLaunched())
 			{
-				RemoveLaunchUITextures();
+				RemoveLaunchUIPlanetTextures();
 				gameState = 2;
 			}
 			break;
@@ -70,6 +72,8 @@ public class MainScript : MonoBehaviour
     void Start()
     {
         gameState = 0;
+
+        spacePuck.SetActive(false);
     }
 
     // Update is called once per frame

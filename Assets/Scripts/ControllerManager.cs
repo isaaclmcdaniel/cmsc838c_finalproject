@@ -10,11 +10,18 @@ public class ControllerManager : MonoBehaviour
     public GameObject zoomObject;
     public float zoomControlSpeed = 1;
     public GameObject gravityDrivenObject;
+    public GameObject springUILine;
+    public GameObject springSelectObject;
 
     private bool moveControlActive;
-    private bool zoomControlActive;
     private Vector3 moveControlLastPos;
+    private bool zoomControlActive;
     private float zoomControlLastDist;
+    private bool puckLanded;
+    private bool launchControlActive;
+    private bool launchTriggerLast;
+    private LineRenderer springUILineRender;
+    
     bool GetMoveTrigger()
     {
         //
@@ -34,6 +41,17 @@ public class ControllerManager : MonoBehaviour
         //Debug.Log("triggerDepth: " + triggerDepth);
         
         bool triggerDown = ((LTriggerDepth > 0.2) && (RTriggerDepth > 0.2)) ? true : false;
+
+        return triggerDown;
+    }
+    
+    bool GetLaunchTrigger()
+    {
+        //
+        float triggerDepth = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger, OVRInput.Controller.Touch);
+        //Debug.Log("triggerDepth: " + triggerDepth);
+        
+        bool triggerDown = (triggerDepth > 0.2) ? true : false;
 
         return triggerDown;
     }
@@ -102,21 +120,63 @@ public class ControllerManager : MonoBehaviour
 
         zoomControlLastDist = Vector3.Distance(transform.position, zoomAnchor.transform.position);
     }
+
+    void LaunchControl()
+    {
+        if (puckLanded)
+        {
+            // Activate launch UI when the right trigger is pressed close to the start planet
+            if (!launchControlActive && !launchTriggerLast && GetLaunchTrigger() && (Vector3.Distance(springSelectObject.transform.position,
+                    levelObject.GetComponent<MainScript>().startObject.transform.position) < 0.2) )
+            {
+                launchControlActive = true;
+                springUILine.SetActive(true);
+            }
+        }
+        
+        if (launchControlActive)
+        {
+            // Draw springUILine each frame
+            var points = new Vector3[2];
+            points[0] = springSelectObject.transform.position;
+            points[1] = levelObject.GetComponent<MainScript>().startObject.transform.position;
+            springUILineRender.SetPositions(points);
+
+            if (!GetLaunchTrigger())
+            {
+                launchControlActive = false;
+                springUILine.SetActive(false);
+                puckLanded = false;
+                
+                // Launch spacePuck
+                Vector3 launchControlVector = points[1] - points[0];
+            }
+        }
+
+        launchTriggerLast = GetLaunchTrigger();
+    }
     
     // Start is called before the first frame update
     void Start()
     {
         moveControlActive = false;
         zoomControlActive = false;
+        puckLanded = true;
+        launchControlActive = false;
+        launchTriggerLast = false;
+        
+        springUILineRender = springUILine.GetComponent<LineRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (OVRInput.GetUp(OVRInput.Button.One))
-        {
-            levelObject.GetComponent<MainScript>().LaunchUIButtonRelease();
-        }        
+        //if (OVRInput.GetUp(OVRInput.Button.One))
+        //{
+            // levelObject.GetComponent<MainScript>().LaunchUIButtonRelease();
+        //}
+
+        LaunchControl();
     }
 
     void LateUpdate()
