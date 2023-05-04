@@ -5,80 +5,63 @@ using UnityEngine;
 public class MainScript : MonoBehaviour
 {
 	public GameObject startObject;
+	public GameObject launchObject;
 	public GameObject destObject;
 	public Material startObjectUIMaterial;
 	public Material destObjectUIMaterial;
 
     public GameObject spacePuck;
 
+    private bool puckFlying;
 	private int gameState;
-	private Material startObjectOrigMaterial;
+	private Material launchObjectOrigMaterial;
 	private Material destObjectOrigMaterial;
 
 	void PaintLaunchUIPlanetTextures()
 	{
-		startObjectOrigMaterial = startObject.GetComponent<MeshRenderer> ().material;
+		launchObjectOrigMaterial = launchObject.GetComponent<MeshRenderer> ().material;
 		destObjectOrigMaterial = destObject.GetComponent<MeshRenderer> ().material;
 
-		startObject.GetComponent<MeshRenderer> ().material = startObjectUIMaterial;
+		launchObject.GetComponent<MeshRenderer> ().material = startObjectUIMaterial;
 		destObject.GetComponent<MeshRenderer> ().material = destObjectUIMaterial;
 	}
 
 	void RemoveLaunchUIPlanetTextures()
 	{
-		startObject.GetComponent<MeshRenderer> ().material = startObjectOrigMaterial;
+		launchObject.GetComponent<MeshRenderer> ().material = launchObjectOrigMaterial;
 		destObject.GetComponent<MeshRenderer> ().material = destObjectOrigMaterial;
 	}
 
-    private void LaunchUIButtonRelease()
-    {
-        if(gameState == 1)
-        {
-            RemoveLaunchUIPlanetTextures();
-            gameState = 2;
-        }
-    }
-
-	bool PackageLaunched()
+	public void LaunchPuck(Vector3 launchControlVector)
 	{
-		return false;
+		RemoveLaunchUIPlanetTextures();
+		
+		spacePuck.SetActive(true);
+		spacePuck.GetComponent<Rigidbody>().AddForce(launchControlVector, ForceMode.VelocityChange);
 	}
 
-	void GameFSM()
+	public void ReadyLaunch()
 	{
-		switch(gameState)
-		{	
-		case 0:
-			PaintLaunchUIPlanetTextures();
-			gameState = 1;
-			break;
-		case 1:
-			// if launched, remove launch UI textures
-			if(PackageLaunched())
-			{
-				RemoveLaunchUIPlanetTextures();
-				gameState = 2;
-			}
-			break;
-		case 2:
-			break;
-			
-		default:
-			break;
-		}
+		PaintLaunchUIPlanetTextures();
+
+		spacePuck.SetActive(false);
+		spacePuck.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+		spacePuck.transform.position = launchObject.transform.position;
+		
+		Physics.IgnoreCollision(spacePuck.GetComponent<Collider>(), launchObject.GetComponent<Collider>(), true);
 	}
 
     // Start is called before the first frame update
     void Start()
     {
-        gameState = 0;
-
-        spacePuck.SetActive(false);
+	    puckFlying = false;
+	    launchObject = startObject;
+	    ReadyLaunch();
     }
 
     // Update is called once per frame
     void Update()
     {
-        GameFSM();
+	    
     }
 }

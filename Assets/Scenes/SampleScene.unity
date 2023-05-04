@@ -1655,7 +1655,7 @@ MonoBehaviour:
     type: 2}
   destObjectUIMaterial: {fileID: 2100000, guid: 66300cc43333a7a46ba6d75b9b237420,
     type: 2}
-  spacePuck: {fileID: 0}
+  spacePuck: {fileID: 228906939}
 --- !u!1 &1702247271
 GameObject:
   m_ObjectHideFlags: 0

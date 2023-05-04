@@ -150,6 +150,7 @@ public class ControllerManager : MonoBehaviour
                 
                 // Launch spacePuck
                 Vector3 launchControlVector = points[1] - points[0];
+                levelObject.GetComponent<MainScript>().LaunchPuck(launchControlVector);
             }
         }
 
