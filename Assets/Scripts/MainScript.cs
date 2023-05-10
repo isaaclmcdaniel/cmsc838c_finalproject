@@ -11,8 +11,10 @@ public class MainScript : MonoBehaviour
 	public Material destObjectUIMaterial;
 
     public GameObject spacePuck;
+    public bool puckFlying;
+    public float launchPositionAdjustment;
+    public float launchVelocityMultiplier;
 
-    private bool puckFlying;
 	private int gameState;
 	private Material launchObjectOrigMaterial;
 	private Material destObjectOrigMaterial;
@@ -36,19 +38,26 @@ public class MainScript : MonoBehaviour
 	{
 		RemoveLaunchUIPlanetTextures();
 		
+		spacePuck.transform.position = launchObject.transform.position + Vector3.Normalize(launchControlVector) * launchPositionAdjustment * transform.localScale.x;
+		spacePuck.transform.rotation = Quaternion.LookRotation(launchControlVector, Vector3.up);
+		spacePuck.transform.Rotate(90, 0, 0, Space.Self);
+		
 		spacePuck.SetActive(true);
-		spacePuck.GetComponent<Rigidbody>().AddForce(launchControlVector, ForceMode.VelocityChange);
+		spacePuck.GetComponent<Rigidbody>().AddForce(launchControlVector * launchVelocityMultiplier * transform.localScale.x, ForceMode.VelocityChange);
+		puckFlying = true;
 	}
 
 	public void ReadyLaunch()
 	{
 		PaintLaunchUIPlanetTextures();
 
+		puckFlying = false;
 		spacePuck.SetActive(false);
 		spacePuck.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
 		spacePuck.transform.position = launchObject.transform.position;
 		
-		Physics.IgnoreCollision(spacePuck.GetComponent<Collider>(), launchObject.GetComponent<Collider>(), true);
+		//Doesn't stop puck from going flying
+		//Physics.IgnoreCollision(spacePuck.GetComponent<Collider>(), launchObject.GetComponent<Collider>(), true);
 	}
 
     // Start is called before the first frame update
@@ -62,6 +71,8 @@ public class MainScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-	    
+	    // Keep puck pointing in the direction of motion
+	    spacePuck.transform.rotation = Quaternion.LookRotation(spacePuck.GetComponent<Rigidbody>().velocity, Vector3.up);
+	    spacePuck.transform.Rotate(90, 0, 0, Space.Self);
     }
 }

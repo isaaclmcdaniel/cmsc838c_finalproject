@@ -34,7 +34,7 @@ public class GravityForce : MonoBehaviour
             {
                 massiveObjects.Add(child.gameObject);
             }
-            Debug.Log("Found massive body");
+            //Debug.Log("Found massive body");
             // do any additional checks here as well
             // if it does, add it to massiveObjects
         }
@@ -66,7 +66,7 @@ public class GravityForce : MonoBehaviour
 	                (gravitationalConstant * mass * massiveObject.GetComponent<GravityProperties>().mass / (dist * dist)) *
 	                temp.normalized;
 	        }
-	        Debug.Log("Total force: " + total_force);
+	        //Debug.Log("Total force: " + total_force);
 	
 	        m_Rigidbody.AddForce(total_force * transform.parent.localScale.x, ForceMode.Force);
     	} 

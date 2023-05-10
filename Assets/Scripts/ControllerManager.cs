@@ -5,10 +5,10 @@ using UnityEngine;
 public class ControllerManager : MonoBehaviour
 {
     public GameObject levelObject;
-    public float moveControlSpeed = 1;
+    public float moveControlSpeed;
     public GameObject zoomAnchor;
     public GameObject zoomObject;
-    public float zoomControlSpeed = 1;
+    public float zoomControlSpeed;
     public GameObject gravityDrivenObject;
     public GameObject springUILine;
     public GameObject springSelectObject;
@@ -17,7 +17,6 @@ public class ControllerManager : MonoBehaviour
     private Vector3 moveControlLastPos;
     private bool zoomControlActive;
     private float zoomControlLastDist;
-    private bool puckLanded;
     private bool launchControlActive;
     private bool launchTriggerLast;
     private LineRenderer springUILineRender;
@@ -123,11 +122,11 @@ public class ControllerManager : MonoBehaviour
 
     void LaunchControl()
     {
-        if (puckLanded)
+        if (!levelObject.GetComponent<MainScript>().puckFlying)
         {
             // Activate launch UI when the right trigger is pressed close to the start planet
             if (!launchControlActive && !launchTriggerLast && GetLaunchTrigger() && (Vector3.Distance(springSelectObject.transform.position,
-                    levelObject.GetComponent<MainScript>().startObject.transform.position) < 0.2) )
+                    levelObject.GetComponent<MainScript>().launchObject.transform.position) < 0.2) )
             {
                 launchControlActive = true;
                 springUILine.SetActive(true);
@@ -139,14 +138,13 @@ public class ControllerManager : MonoBehaviour
             // Draw springUILine each frame
             var points = new Vector3[2];
             points[0] = springSelectObject.transform.position;
-            points[1] = levelObject.GetComponent<MainScript>().startObject.transform.position;
+            points[1] = levelObject.GetComponent<MainScript>().launchObject.transform.position;
             springUILineRender.SetPositions(points);
 
             if (!GetLaunchTrigger())
             {
                 launchControlActive = false;
                 springUILine.SetActive(false);
-                puckLanded = false;
                 
                 // Launch spacePuck
                 Vector3 launchControlVector = points[1] - points[0];
@@ -162,7 +160,6 @@ public class ControllerManager : MonoBehaviour
     {
         moveControlActive = false;
         zoomControlActive = false;
-        puckLanded = true;
         launchControlActive = false;
         launchTriggerLast = false;
         
@@ -172,11 +169,6 @@ public class ControllerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (OVRInput.GetUp(OVRInput.Button.One))
-        //{
-            // levelObject.GetComponent<MainScript>().LaunchUIButtonRelease();
-        //}
-
         LaunchControl();
     }
 
