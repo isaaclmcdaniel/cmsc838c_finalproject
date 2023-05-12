@@ -15,7 +15,6 @@ public class MainScript : MonoBehaviour
     public float launchPositionAdjustment;
     public float launchVelocityMultiplier;
 
-	private int gameState;
 	private Material launchObjectOrigMaterial;
 	private Material destObjectOrigMaterial;
 
@@ -53,11 +52,20 @@ public class MainScript : MonoBehaviour
 
 		puckFlying = false;
 		spacePuck.SetActive(false);
-		spacePuck.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+		spacePuck.GetComponent<Rigidbody>().velocity = Vector3.zero;
+		spacePuck.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 		spacePuck.transform.position = launchObject.transform.position;
-		
-		//Doesn't stop puck from going flying
-		//Physics.IgnoreCollision(spacePuck.GetComponent<Collider>(), launchObject.GetComponent<Collider>(), true);
+	}
+
+	public void PuckRelaunch()
+	{
+		ReadyLaunch();
+	}
+
+	public void PuckReset()
+	{
+		launchObject = startObject;
+		ReadyLaunch();
 	}
 
     // Start is called before the first frame update

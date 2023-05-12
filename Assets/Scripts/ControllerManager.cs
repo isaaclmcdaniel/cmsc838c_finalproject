@@ -1,17 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ControllerManager : MonoBehaviour
 {
-    public GameObject levelObject;
     public float moveControlSpeed;
+    public float omsThrustScaling = 1;
+    
+    public GameObject levelObject;
     public GameObject zoomAnchor;
     public GameObject zoomObject;
-    public float zoomControlSpeed;
     public GameObject gravityDrivenObject;
     public GameObject springUILine;
     public GameObject springSelectObject;
+    public GameObject puckObject;
 
     private bool moveControlActive;
     private Vector3 moveControlLastPos;
@@ -20,6 +23,18 @@ public class ControllerManager : MonoBehaviour
     private bool launchControlActive;
     private bool launchTriggerLast;
     private LineRenderer springUILineRender;
+    private MainScript levelpuckscript;
+    private Rigidbody puckRigidbody;
+
+    bool GetRelaunchButton()
+    {
+        return OVRInput.GetUp(OVRInput.Button.One);
+    }
+
+    bool GetResetButton()
+    {
+        return OVRInput.GetUp(OVRInput.Button.Two);
+    }
     
     bool GetMoveTrigger()
     {
@@ -70,7 +85,7 @@ public class ControllerManager : MonoBehaviour
         if (moveControlActive)
         {
             // Update levelObject's position, but not rotation, according to left controller's movement
-            levelObject.transform.Translate(transform.position - moveControlLastPos, Space.World);
+            levelObject.transform.Translate((transform.position - moveControlLastPos) * moveControlSpeed, Space.World);
         }
         
         if (GetMoveTrigger() && !moveControlActive)
@@ -122,11 +137,11 @@ public class ControllerManager : MonoBehaviour
 
     void LaunchControl()
     {
-        if (!levelObject.GetComponent<MainScript>().puckFlying)
+        if (!levelpuckscript.puckFlying)
         {
             // Activate launch UI when the right trigger is pressed close to the start planet
             if (!launchControlActive && !launchTriggerLast && GetLaunchTrigger() && (Vector3.Distance(springSelectObject.transform.position,
-                    levelObject.GetComponent<MainScript>().launchObject.transform.position) < 0.2) )
+                    levelpuckscript.launchObject.transform.position) < 0.2) )
             {
                 launchControlActive = true;
                 springUILine.SetActive(true);
@@ -138,7 +153,7 @@ public class ControllerManager : MonoBehaviour
             // Draw springUILine each frame
             var points = new Vector3[2];
             points[0] = springSelectObject.transform.position;
-            points[1] = levelObject.GetComponent<MainScript>().launchObject.transform.position;
+            points[1] = levelpuckscript.launchObject.transform.position;
             springUILineRender.SetPositions(points);
 
             if (!GetLaunchTrigger())
@@ -148,7 +163,7 @@ public class ControllerManager : MonoBehaviour
                 
                 // Launch spacePuck
                 Vector3 launchControlVector = points[1] - points[0];
-                levelObject.GetComponent<MainScript>().LaunchPuck(launchControlVector);
+                levelpuckscript.LaunchPuck(launchControlVector);
             }
         }
 
@@ -164,12 +179,49 @@ public class ControllerManager : MonoBehaviour
         launchTriggerLast = false;
         
         springUILineRender = springUILine.GetComponent<LineRenderer>();
+
+        levelpuckscript = levelObject.GetComponent<MainScript>();
+        puckRigidbody = puckObject.GetComponent<Rigidbody>();
+    }
+
+    void ApplyCourseCorrection()
+    {
+        // thumstick control: forward to thrust in prograde direction, backwards for retrograde
+        var direction = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick, OVRInput.Controller.Touch);
+        // just care about y direction for now (prograde/retrograde)
+        // in the future maybe use x direction and controller orientation for roll/yaw stuff
+
+        var totalForce = new Vector3(0, 0, 0);
+        puckRigidbody.AddForce(puckRigidbody.velocity.normalized * (omsThrustScaling * direction.y));
+    }
+
+    private void FixedUpdate()
+    {
+        if (levelpuckscript.puckFlying)
+        {
+            ApplyCourseCorrection();
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         LaunchControl();
+
+        if (levelpuckscript.puckFlying)
+        {
+            if (GetRelaunchButton())
+            {
+                // call reset function in MainScript
+                levelpuckscript.PuckRelaunch();
+            }
+
+            if (GetResetButton())
+            {
+                // call reset function in MainScript
+                levelpuckscript.PuckReset();
+            }
+        }
     }
 
     void LateUpdate()
