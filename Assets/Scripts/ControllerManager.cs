@@ -2,9 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ControllerManager : MonoBehaviour
 {
+    public bool isTutorial;
+    
     public float moveControlSpeed;
     public float omsThrustScaling = 1;
     
@@ -25,6 +28,11 @@ public class ControllerManager : MonoBehaviour
     private LineRenderer springUILineRender;
     private MainScript levelpuckscript;
     private Rigidbody puckRigidbody;
+
+    bool GetContinueButton()
+    {
+        return OVRInput.GetUp(OVRInput.Button.Three);
+    }
 
     bool GetRelaunchButton()
     {
@@ -228,5 +236,22 @@ public class ControllerManager : MonoBehaviour
     {
         MoveControl();
         ZoomControl();
+
+        if (levelObject.GetComponent<MainScript>().puckAtDest && GetContinueButton())
+        {
+            // Change scene
+            if (isTutorial)
+            {
+                SceneManager.LoadScene("Scenes/LevelScene");
+                isTutorial = false;
+            }
+            else
+            {
+                {
+                    SceneManager.LoadScene("Scenes/TutorialScene");
+                    isTutorial = true;
+                }
+            }
+        }
     }
 }

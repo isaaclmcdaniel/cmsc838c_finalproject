@@ -7,15 +7,19 @@ using UnityEngine;
 public class PuckScript : MonoBehaviour
 {
     public GameObject scorecardobject;
-    private TextMeshProUGUI scorecard;
-    private int score = 1;
+    public TextMeshProUGUI scorecard;
+    public int score;
 
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Reacting to collision");
+        score += 1;
         scorecard.text = "Score: " + score;   
         if (other.gameObject.CompareTag("Destination"))
         {
+            transform.parent.gameObject.GetComponent<MainScript>().puckAtDest = true;
+            transform.parent.gameObject.GetComponent<MainScript>().launchObject = other.gameObject;
+            
             // display final score and add option to reset
             scorecard.text = "Score: " + score + "\nPress X to continue";  
         }
@@ -23,7 +27,6 @@ public class PuckScript : MonoBehaviour
         // Set new start object
         if (other.gameObject.CompareTag("Launchable"))
         {
-            score += 1;
             transform.parent.gameObject.GetComponent<MainScript>().launchObject = other.gameObject;
         }
 
@@ -34,7 +37,7 @@ public class PuckScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        score = 1;
+        score = 0;
         scorecard = scorecardobject.GetComponent<TextMeshProUGUI>();
     }
 

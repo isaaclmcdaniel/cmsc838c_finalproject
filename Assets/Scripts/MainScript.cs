@@ -12,6 +12,7 @@ public class MainScript : MonoBehaviour
 
     public GameObject spacePuck;
     public bool puckFlying;
+    public bool puckAtDest;
     public float launchPositionAdjustment;
     public float launchVelocityMultiplier;
 
@@ -44,6 +45,7 @@ public class MainScript : MonoBehaviour
 		spacePuck.SetActive(true);
 		spacePuck.GetComponent<Rigidbody>().AddForce(launchControlVector * launchVelocityMultiplier * transform.localScale.x, ForceMode.VelocityChange);
 		puckFlying = true;
+		puckAtDest = false;
 	}
 
 	public void ReadyLaunch()
@@ -60,11 +62,22 @@ public class MainScript : MonoBehaviour
 	public void PuckRelaunch()
 	{
 		ReadyLaunch();
+		spacePuck.GetComponent<PuckScript>().score += 1;
+		spacePuck.GetComponent<PuckScript>().scorecard.text = "Score: " + spacePuck.GetComponent<PuckScript>().score;
+
+		if (launchObject == destObject)
+		{
+			puckAtDest = true;
+			spacePuck.GetComponent<PuckScript>().scorecard.text = "Score: " + spacePuck.GetComponent<PuckScript>().score + "\nPress X to continue";
+		}
 	}
 
 	public void PuckReset()
 	{
 		launchObject = startObject;
+		spacePuck.GetComponent<PuckScript>().score = 0;
+		puckAtDest = false;
+		spacePuck.GetComponent<PuckScript>().scorecard.text = "Score: ";
 		ReadyLaunch();
 	}
 
@@ -72,6 +85,7 @@ public class MainScript : MonoBehaviour
     void Start()
     {
 	    puckFlying = false;
+	    puckAtDest = false;
 	    launchObject = startObject;
 	    ReadyLaunch();
     }
